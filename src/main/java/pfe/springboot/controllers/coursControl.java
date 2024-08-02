@@ -13,8 +13,9 @@ public class coursControl {
     @Autowired
     coursInter coursInter;
     @PostMapping(value="/postcours")
-    public cours adddcours(@RequestBody cours Vcours){
+    public cours adddcours(@RequestBody cours Vcours) {
         return coursInter.addcours(Vcours);
     }
 
+    
 }

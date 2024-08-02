@@ -16,9 +16,11 @@ public interface formateurRepository extends JpaRepository<Formateur,Long> {
 
     boolean existsByEmail(String email);
 
+    Optional<Formateur> findByEmail(String email);
 
     Formateur findByNomEtPrenom(String nomEtPrenom);
 
+    Formateur findByEmailAndPassword(String email, String password);
 
    @Query(value = "select * from Formateur fé  where f.email like :cle%",nativeQuery = true)
  List<Formateur> userEmail(@Param("cle") String email);

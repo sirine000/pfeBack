@@ -1,6 +1,8 @@
 package pfe.springboot.services.formateur;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
+
 import pfe.springboot.entities.Formateur;
 import pfe.springboot.entities.cycle;
 
@@ -14,13 +16,13 @@ public interface formateurserviceInter {
 
     String confirmemail(Formateur email);
 
-
+    public Formateur ajouterFormateur(Formateur formateur);
 
     Formateur updateProf(Long id_formateur, Formateur updateProf);
 
-    //List<Formateur> listprof();
+    // List<Formateur> listprof();
 
-    Formateur userid(Long id_formateur, Formateur prof);
+    Formateur userid(Long id_formateur);
 
     Formateur affichnp(String np);
 
@@ -28,12 +30,18 @@ public interface formateurserviceInter {
 
     List<Formateur> nomprof(String nomEtPrenom);
 
+    public void savePhoto(Long id, MultipartFile file);
 
     List<String> getnoms();
 
     void deleteformateur(Long id_formateur);
 
-    ResponseEntity<Formateur> connecter(String nomEtPrenom, String password);
+    public Formateur connecter(String email, String password);
 
     Optional<cycle> getcycleid(Long idCycle);
+
+    public Formateur activateFormateur(Long id);
+
+    public Formateur deactivateFormateur(Long id);
+
 }

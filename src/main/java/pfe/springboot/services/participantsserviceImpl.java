@@ -6,6 +6,7 @@ import pfe.springboot.entities.participant;
 import pfe.springboot.repository.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class participantsserviceImpl implements userServicesinter {
@@ -36,6 +37,12 @@ public class participantsserviceImpl implements userServicesinter {
     public List<participant> getAllUser() {
         return userRepository.findAll();
     }
+
+    @Override
+    public Optional<participant> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
 }
 
 

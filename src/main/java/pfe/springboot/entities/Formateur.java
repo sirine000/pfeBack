@@ -16,12 +16,12 @@ import java.util.Set;
 @Getter
 @Setter
 
-public class Formateur  {
+public class Formateur {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_formateur;
 
-   private String nomEtPrenom;
+    private String nomEtPrenom;
 
     private String email;
     private String password;
@@ -29,26 +29,27 @@ public class Formateur  {
     private String confPassword;
     private Integer Tel;
 
-//    @OneToOne
-//    @JoinColumn(name = "utilisateur_id")
-//    private utilisateurs utilisateurs;
+    private boolean active = true;
 
-@JsonIgnore
-    @OneToMany(mappedBy ="formateur",cascade = CascadeType.ALL)
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] photo;
+    // @OneToOne
+    // @JoinColumn(name = "utilisateur_id")
+    // private utilisateurs utilisateurs;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "formateur", cascade = CascadeType.ALL)
 
-    private Set<cycle> cycle =new HashSet<>();
+    private Set<cycle> cycle = new HashSet<>();
 
-//@OneToMany(mappedBy ="formateur",cascade = CascadeType.ALL)
-//@JsonBackReference
-//
-//private Set<cycle> cycle =new HashSet<>();
+    // @OneToMany(mappedBy ="formateur",cascade = CascadeType.ALL)
+    // @JsonBackReference
+    //
+    // private Set<cycle> cycle =new HashSet<>();
 
-
-
-
-//    public String getNomEtPrenom() {
-//        return nomEtPrenom;
-//    }
+    // public String getNomEtPrenom() {
+    // return nomEtPrenom;
+    // }
 
 }

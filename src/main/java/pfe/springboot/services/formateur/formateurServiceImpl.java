@@ -6,6 +6,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import io.jsonwebtoken.io.IOException;
 import pfe.springboot.entities.Formateur;
 import pfe.springboot.entities.cycle;
 import pfe.springboot.entities.role;
@@ -20,6 +24,14 @@ public class formateurServiceImpl implements formateurserviceInter {
     @Autowired
     formateurRepository formateurRepository;
 
+    @Override
+    public Formateur ajouterFormateur(Formateur formateur) {
+        Optional<Formateur> existingFormateur = formateurRepository.findByEmail(formateur.getEmail());
+        if (existingFormateur.isPresent()) {
+            throw new IllegalArgumentException("Un formateur avec cet e-mail existe déjà.");
+        }
+        return formateurRepository.save(formateur);
+    }
 
     @Override
     public Formateur addformateur(Formateur f) {
@@ -60,15 +72,20 @@ public class formateurServiceImpl implements formateurserviceInter {
 }
 
     @Override
-    public Formateur updateProf(Long id_formateur, Formateur updateProf) {
-        Formateur ProfModifier= formateurRepository.findById(id_formateur ).get();
-//        ProfModifier.setNomEtPrenom(updateProf.getNomEtPrenom());
-        ProfModifier.setEmail(updateProf.getEmail());
-        ProfModifier.setPassword(updateProf.getPassword());
-        ProfModifier.setConfPassword(updateProf.getConfPassword());
-        ProfModifier.setTel(updateProf.getTel());
+    public Formateur updateProf(Long id_formateur, Formateur formateurmodifier) {
+        // Check if the formateur exists
+        Formateur existingFormateur = formateurRepository.findById(id_formateur)
+                .orElseThrow(() -> new RuntimeException("Formateur not found"));
 
-        return formateurRepository.save(ProfModifier);
+        // Update the existing formateur with the new values
+        existingFormateur.setNomEtPrenom(formateurmodifier.getNomEtPrenom());
+        existingFormateur.setTel(formateurmodifier.getTel());
+        existingFormateur.setEmail(formateurmodifier.getEmail());
+        existingFormateur.setPassword(formateurmodifier.getPassword());
+        // Add any other fields that need to be updated
+
+        // Save the updated formateur
+        return formateurRepository.save(existingFormateur);
     }
 
   // @Override
@@ -84,7 +101,7 @@ public class formateurServiceImpl implements formateurserviceInter {
 
 
     @Override
-    public Formateur userid(Long id_formateur , Formateur prof) {
+    public Formateur userid(Long id_formateur) {
         return formateurRepository.findById(id_formateur ).orElse(null);
     }
 
@@ -93,6 +110,23 @@ public class formateurServiceImpl implements formateurserviceInter {
         return formateurRepository.findByNomEtPrenom(np);
     }
 
+    @Override
+    public void savePhoto(Long id, MultipartFile file) throws IOException {
+        try {
+            Formateur formateur = formateurRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Formateur not found"));
+            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+            formateur.setPhoto(file.getBytes());
+            formateurRepository.save(formateur);
+        } catch (IOException e) {
+            // Handle the exception as needed
+            throw new RuntimeException("Failed to save photo", e);
+        } catch (java.io.IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+    
     @Override
     public List<Formateur> listesearch(String email) {
         return formateurRepository.userEmail(email);
@@ -121,21 +155,27 @@ public class formateurServiceImpl implements formateurserviceInter {
     }
 
     @Override
-    public ResponseEntity<Formateur> connecter(String nomEtPrenom, String password) {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-Formateur formateur=formateurRepository.findByNomEtPrenom(nomEtPrenom);
-//if(formateur!=null && formateur.getPassword()==password)
-
-        if(formateur!=null && passwordEncoder.matches(password,formateur.getPassword())){
-            return ResponseEntity.ok(formateur); //message positif
-        }else{
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+    public Formateur connecter(String email, String password) {
+        return formateurRepository.findByEmailAndPassword(email, password);
     }
-
     @Override
     public Optional<cycle> getcycleid(Long idCycle) {
         return Optional.empty();
     }
 
+    @Override
+    public Formateur activateFormateur(Long id) {
+        Formateur formateur = formateurRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Formateur not found"));
+        formateur.setActive(true);
+        return formateurRepository.save(formateur);
+    }
+
+    @Override
+    public Formateur deactivateFormateur(Long id) {
+        Formateur formateur = formateurRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Formateur not found"));
+        formateur.setActive(false);
+        return formateurRepository.save(formateur);
+    }
 }
